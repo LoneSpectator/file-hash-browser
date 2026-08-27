@@ -1,0 +1,14 @@
+"""Example administrator-installed hash plugin."""
+
+import hashlib
+
+
+def register(registry):
+    registry.register(
+        algorithm_id="blake2b",
+        label="BLAKE2b-512",
+        description="512 位 BLAKE2 文件摘要",
+        digest_length=128,
+        order=50,
+        factory=hashlib.blake2b,
+    )

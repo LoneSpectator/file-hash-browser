@@ -1,0 +1,26 @@
+services:
+  file-hash-browser:
+    build:
+      context: .
+    image: file-hash-browser:local
+    container_name: file-hash-browser
+    restart: unless-stopped
+    ports:
+      # 默认只允许本机访问；可信局域网部署可改为 "8080:8080"。
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./config.docker.json:/config/config.json:ro
+      # 把下方路径改成需要授权浏览的宿主机目录，并保持只读。
+      - /path/to/authorized/files:/files:ro
+      - file-hash-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+volumes:
+  file-hash-data:
+

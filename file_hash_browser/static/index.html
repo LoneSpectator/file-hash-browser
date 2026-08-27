@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <meta name="description" content="浏览授权目录并在后台计算文件哈希">
+    <title>File Hash Browser</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/assets/styles.css">
+    <script src="/assets/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#file-browser">跳到文件列表</a>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">#</span>
+        <div>
+          <h1 id="app-title">File Hash Browser</h1>
+          <p>授权目录哈希计算器</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <span id="privacy-badge" class="status-badge">读取配置中</span>
+        <span id="worker-badge" class="status-badge">—</span>
+        <button id="jobs-button" class="button secondary jobs-button" type="button">
+          后台任务
+          <span id="jobs-count" class="count-badge" hidden>0</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside class="tree-panel" aria-label="授权目录树">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">AUTHORIZED</span>
+            <h2>文件目录</h2>
+          </div>
+          <button id="tree-refresh" class="icon-button" type="button" aria-label="刷新目录树">↻</button>
+        </div>
+        <div id="directory-tree" class="directory-tree" role="tree" aria-label="文件目录"></div>
+      </aside>
+
+      <main id="file-browser" class="browser-panel" tabindex="-1">
+        <div class="browser-toolbar">
+          <div class="location-block">
+            <button id="back-button" class="icon-button" type="button" aria-label="返回上级目录" disabled>←</button>
+            <div>
+              <nav id="breadcrumbs" class="breadcrumbs" aria-label="当前位置"></nav>
+              <h2 id="current-directory">请选择目录</h2>
+            </div>
+          </div>
+          <div class="toolbar-actions">
+            <button id="select-directory" class="button ghost" type="button" disabled>选择当前目录</button>
+            <button id="refresh-directory" class="button ghost" type="button" disabled>刷新</button>
+            <details id="column-menu" class="column-menu">
+              <summary class="button ghost">显示列</summary>
+              <fieldset id="column-options" class="column-options">
+                <legend>选择表格列</legend>
+              </fieldset>
+            </details>
+          </div>
+        </div>
+
+        <div id="table-region" class="table-region" aria-live="polite" aria-busy="false">
+          <table id="file-table" class="file-table">
+            <thead><tr id="file-table-head"></tr></thead>
+            <tbody id="file-table-body"></tbody>
+          </table>
+          <div id="empty-state" class="empty-state">
+            <span class="empty-icon" aria-hidden="true">⌁</span>
+            <h3>从左侧选择一个目录</h3>
+            <p>文件内容不会通过网页提供下载。</p>
+          </div>
+          <div class="load-more-row">
+            <button id="load-more" class="button secondary" type="button" hidden>加载更多</button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <section class="action-dock" aria-label="创建哈希任务">
+      <div class="selection-summary">
+        <span class="eyebrow">SELECTED</span>
+        <strong id="selection-count">尚未选择文件或目录</strong>
+        <button id="clear-selection" class="text-button" type="button" disabled>清除选择</button>
+      </div>
+      <fieldset id="algorithm-picker" class="algorithm-picker">
+        <legend>计算算法</legend>
+      </fieldset>
+      <label class="strategy-field">
+        <span>计算方式</span>
+        <select id="strategy-select">
+          <option value="missing-only">仅计算缺失值</option>
+          <option value="recalculate">重新计算并覆盖</option>
+        </select>
+      </label>
+      <button id="start-job" class="button primary" type="button" disabled>开始后台计算</button>
+    </section>
+
+    <dialog id="jobs-dialog" class="modal jobs-modal" aria-labelledby="jobs-title">
+      <div class="modal-heading">
+        <div>
+          <span class="eyebrow">BACKGROUND QUEUE</span>
+          <h2 id="jobs-title">后台任务</h2>
+          <p>关闭网页不会影响已经提交的计算。</p>
+        </div>
+        <button id="jobs-close" class="icon-button" type="button" aria-label="关闭后台任务">×</button>
+      </div>
+      <div id="jobs-list" class="jobs-list"></div>
+      <div class="modal-footer">
+        <span id="jobs-help">只显示等待中和正在运行的任务，完成后自动清除。</span>
+        <button id="clear-jobs" class="button danger" type="button" disabled>清空全部任务</button>
+      </div>
+    </dialog>
+
+    <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+  </body>
+</html>
+
